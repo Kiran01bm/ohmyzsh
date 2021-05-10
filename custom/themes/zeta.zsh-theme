@@ -94,8 +94,6 @@ function get_space {
     echo $space
 }
 
-
-
 # Kube Context
 function get_kube_context {
     echo `kubectl config view -o=jsonpath='{.current-context}'`
@@ -103,7 +101,24 @@ function get_kube_context {
 
 # Kube Namesapce
 function get_kube_namespace {
-    echo `kubectl config view --minify --output 'jsonpath={..namespace}'`
+    namespace=`kubectl config view --minify --output 'jsonpath={..namespace}'`
+
+    if [[ $namespace != "" ]]; then
+    	echo "%{$green_bold%}$namespace%{$reset_color%}"
+    else
+	echo "%{$red_bold%}KUBENS_NONE%{$reset_color%}"
+    fi
+
+}
+
+
+function get_aws_cred_status {
+    OUTPUT=$(aws sts get-caller-identity 2>/dev/null)
+    if [[ $? -eq 0 ]]; then
+        echo "%{$green_bold%}$AWS_PROFILE%{$reset_color%}"
+    else
+    	 echo "%{$red_bold%}$AWS_PROFILE%{$reset_color%}"
+    fi
 }
 
 # Prompt: # USER@MACHINE: DIRECTORY <BRANCH [STATUS]> --- (TIME_STAMP)
@@ -115,7 +130,7 @@ function print_prompt_head {
 %{$cyan_bold%}mypc: \
 %{$yellow_bold%}$(get_current_dir)%{$reset_color%}\
 $(get_git_prompt) "
-    local right_prompt="(%{$yellow_bold%}$AWS_PROFILE%{$reset_color%}"-"%{$red_bold%}$(get_kube_namespace)%{$reset_color%}"-"%{$white_bold%}$(get_kube_context)%{$reset_color%}"-"%{$green_bold%}$(get_time_stamp)%{$reset_color%})"
+    local right_prompt="($(get_aws_cred_status)"-"$(get_kube_namespace)"-"%{$white_bold%}$(get_kube_context)%{$reset_color%}"-"%{$green_bold%}$(get_time_stamp)%{$reset_color%})"
     print -rP "$left_prompt$(get_space $left_prompt $right_prompt)$right_prompt"
 }
 
