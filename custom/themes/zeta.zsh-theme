@@ -81,6 +81,10 @@ function get_time_stamp {
     echo "%*"
 }
 
+function get_dd_mon_yy {
+    echo `date +%d-%b-%y`
+}
+
 function get_space {
     local str=$1$2
     local zero='%([BSUbfksu]|([FB]|){*})'
@@ -130,7 +134,7 @@ function print_prompt_head {
 %{$cyan_bold%}mypc: \
 %{$yellow_bold%}$(get_current_dir)%{$reset_color%}\
 $(get_git_prompt) "
-    local right_prompt="($(get_aws_cred_status)"-"$(get_kube_namespace)"-"%{$white_bold%}$(get_kube_context)%{$reset_color%}"-"%{$green_bold%}$(get_time_stamp)%{$reset_color%})"
+    local right_prompt="($(get_aws_cred_status)"-"$(get_kube_namespace)"-"%{$white_bold%}$(get_kube_context)%{$reset_color%}"-"%{$green_bold%}$(get_dd_mon_yy)-$(get_time_stamp)%{$reset_color%})"
     print -rP "$left_prompt$(get_space $left_prompt $right_prompt)$right_prompt"
 }
 
@@ -148,3 +152,4 @@ setopt prompt_subst
 
 PROMPT='$(get_prompt_indicator)'
 RPROMPT='$(git_prompt_short_sha) '
+
